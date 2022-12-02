@@ -153,35 +153,21 @@
                 return opponentShape;
             }
 
-            if (opponentShape == Shape.Paper && result == GameResult.Win)
+            int moveBy = result switch
             {
-                return Shape.Scissors;
-            }
-            else if (opponentShape == Shape.Paper && result == GameResult.Lose)
-            {
-                return Shape.Rock;
-            }
-            else if (opponentShape == Shape.Scissors && result == GameResult.Win)
-            {
-                return Shape.Rock;
-            }
-            else if (opponentShape == Shape.Scissors && result == GameResult.Lose)
-            {
-                return Shape.Paper;
-            }
-            else if (opponentShape == Shape.Rock && result == GameResult.Win)
-            {
-                return Shape.Paper;
-            }
-            else if (opponentShape == Shape.Rock && result == GameResult.Lose)
-            {
-                return Shape.Scissors;
-            }
-            else
-            {
-                throw new InvalidOperationException("Can't calculate outcome of "
-                    + "game given opponent shape and expected result");
-            }
+                GameResult.Win => 1,
+                GameResult.Lose => -1,
+                GameResult.Draw => 0,
+                _ => throw new ArgumentOutOfRangeException(nameof(result))
+            };
+
+            int index = Mod((int)opponentShape + moveBy, 3);
+            return (Shape)index;
+        }
+
+        private static int Mod(int x, int m)
+        {
+            return (x % m + m) % m;
         }
     }
 }
