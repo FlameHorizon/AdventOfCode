@@ -14,28 +14,27 @@
         private static void Part1()
         {
             Stack<Crate>[] cargo = CreateCargoFromInput();
-            RearrangementProcedure rearrangementProc = CreateRearrangementProcedureFromInput();
-            foreach (MoveProcedure moveProc in rearrangementProc.MoveProcedures)
+            RearrangementProcedure rearrangementProcedure = GetProcedure();
+            foreach (MoveProcedure procedure in rearrangementProcedure.Procedures)
             {
-                cargo = CrateMover9000.Move(cargo, moveProc);
+                cargo = CrateMover9000.Move(cargo, procedure);
             }
-            string result = JoinTopCratesNames(cargo);
+
+            string result = string.Empty;
+            foreach (Stack<Crate> crateStack in cargo)
+            {
+                result += crateStack.Peek().Name;
+            }
 
             Console.WriteLine("After the rearrangement procedure completes, "
                 + "what crate ends up on top of each stack?");
             Console.WriteLine(result);
         }
 
-        private static string JoinTopCratesNames(Stack<Crate>[] cargo)
-        {
-            return string.Join(separator: string.Empty,
-                               cargo.Select(x => x.Peek().Name));
-        }
-
         private static Stack<Crate>[] CreateCargoFromInput()
         {
             var output = new Stack<Crate>[9];
-            List<string> cargos = new()
+            List<string> cargos = new List<string>
             {
                 "RGHQSNBT",
                 "HSFDPZJ",
@@ -58,12 +57,12 @@
             return output;
         }
 
-        private static RearrangementProcedure CreateRearrangementProcedureFromInput()
+        private static RearrangementProcedure GetProcedure()
         {
             var output = new RearrangementProcedure();
             foreach (string ln in File.ReadAllLines(@"data\input.txt"))
             {
-                output.MoveProcedures.Add(new MoveProcedure(ln));
+                output.Procedures.Add(new MoveProcedure(ln));
             }
 
             return output;
@@ -94,7 +93,7 @@
 
         private class RearrangementProcedure
         {
-            public List<MoveProcedure> MoveProcedures { get; } = new();
+            public List<MoveProcedure> Procedures { get; } = new();
         }
 
         private class MoveProcedure
@@ -115,13 +114,17 @@
         private static void Part2()
         {
             Stack<Crate>[] cargo = CreateCargoFromInput();
-            RearrangementProcedure rearrangementProcedure = CreateRearrangementProcedureFromInput();
-            foreach (MoveProcedure procedure in rearrangementProcedure.MoveProcedures)
+            RearrangementProcedure rearrangementProcedure = GetProcedure();
+            foreach (MoveProcedure procedure in rearrangementProcedure.Procedures)
             {
                 cargo = CrateMover9001.Move(cargo, procedure);
             }
 
-            string result = JoinTopCratesNames(cargo);
+            string result = string.Empty;
+            foreach (Stack<Crate> crateStack in cargo)
+            {
+                result += crateStack.Peek().Name;
+            }
 
             Console.WriteLine("After the rearrangement procedure completes, "
                 + "what crate ends up on top of each stack?");
