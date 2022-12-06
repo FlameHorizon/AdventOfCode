@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 
 namespace AdventOfCode.D6
 {
@@ -16,51 +17,49 @@ namespace AdventOfCode.D6
 
         private static void Part1()
         {
-            System.Console.WriteLine("How many characters need to be processed before the "
-                                     + "first start-of-packet marker is detected?");
+            Console.WriteLine("How many characters need to be processed before the "
+                            + "first start-of-packet marker is detected?");
 
             var device = new CommunicationDevice();
             device.LockOn();
 
-            int result = device.SignalInfo.StartOfPacketMarker;
-            System.Console.WriteLine(result);
+            Console.WriteLine(device.SignalInfo.StartOfPacketMarker);
+        }
+
+        private enum MarkerTypes
+        {
+            StartOfPacket = 0,
+            StartOfMessage
         }
 
         private class CommunicationDevice
         {
-            public SignalInfo SignalInfo { get; private set; } = null;
+            public SignalInfo SignalInfo { get; private set; } = null!;
 
             public void LockOn()
             {
                 SignalInfo = new SignalInfo(File.ReadAllText(@"data\input.txt"));
-                SignalInfo.StartOfPacketMarker = DetectStartOfPackerMarker();
-                SignalInfo.StartOfMessageMarker = DetectStartOfMessageMarker();
+                SignalInfo.StartOfPacketMarker = DetectMarker(MarkerTypes.StartOfPacket);
+                SignalInfo.StartOfMessageMarker = DetectMarker(MarkerTypes.StartOfMessage);
             }
 
-            private int DetectStartOfPackerMarker()
+            private int DetectMarker(MarkerTypes type)
             {
-                const int markerLength = 4;
-
-                for (int i = 0; i < SignalInfo.SignalRaw.Length - markerLength; i++)
+                return type switch
                 {
-                    var range = SignalInfo.SignalRaw[i..(i + markerLength)];
-                    if (range.Distinct().Count() == markerLength)
-                    {
-                        return i + markerLength;
-                    }
-                }
-
-                return -1;
+                    MarkerTypes.StartOfPacket => DetectMarket(markerLength: 4),
+                    MarkerTypes.StartOfMessage => DetectMarket(14),
+                    _ => throw new ArgumentOutOfRangeException(nameof(type))
+                };
             }
 
-            private int DetectStartOfMessageMarker()
+            private int DetectMarket(int markerLength)
             {
-                const int markerLength = 14;
 
-                for (int i = 0; i < SignalInfo.SignalRaw.Length - markerLength; i++)
+                for (int i = 0; i < SignalInfo.Raw.Length - markerLength; i++)
                 {
-                    var range = SignalInfo.SignalRaw[i..(i + markerLength)];
-                    if (range.Distinct().Count() == markerLength)
+                    var substring = SignalInfo.Raw[i..(i + markerLength)];
+                    if (substring.Distinct().Count() == markerLength)
                     {
                         return i + markerLength;
                     }
@@ -72,26 +71,25 @@ namespace AdventOfCode.D6
 
         private class SignalInfo
         {
-            public string SignalRaw = string.Empty;
+            public string Raw { get; init; }
             public int StartOfPacketMarker { get; set; }
             public int StartOfMessageMarker { get; set; }
 
-            public SignalInfo(string signal)
+            public SignalInfo(string rawSignal)
             {
-                SignalRaw = signal;
+                Raw = rawSignal;
             }
         }
 
         private static void Part2()
         {
-            System.Console.WriteLine("How many characters need to be processed "
-                + "before the first start-of-message marker is detected?");
+            Console.WriteLine("How many characters need to be processed "
+                            + "before the first start-of-message marker is detected?");
 
             var device = new CommunicationDevice();
             device.LockOn();
 
-            int result = device.SignalInfo.StartOfMessageMarker;
-            System.Console.WriteLine(result);
+            Console.WriteLine(device.SignalInfo.StartOfMessageMarker);
         }
     }
 }
