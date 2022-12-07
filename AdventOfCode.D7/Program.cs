@@ -1,8 +1,6 @@
-﻿using System.Text.RegularExpressions;
-using System.IO;
+﻿using System.IO;
+using System.Text.RegularExpressions;
 using System.Collections.Immutable;
-using System.Security.Cryptography.X509Certificates;
-using System.ComponentModel.Design.Serialization;
 
 namespace AdventOfCode.D7
 {
@@ -26,7 +24,7 @@ namespace AdventOfCode.D7
 
             Directory root = ParseInput(input);
 
-            int result = GetSize(root);
+            int result = GetSizes(root).Where(x => x <= 100000).Sum();
             Console.WriteLine(result);
         }
 
@@ -76,25 +74,13 @@ namespace AdventOfCode.D7
             return root;
         }
 
-        private static bool IsMoveOut(string ln)
-        {
-            return ln.Contains("$ cd ..");
-        }
+        private static bool IsMoveOut(string ln) => ln.Contains("$ cd ..");
 
-        private static bool IsDirectory(string ln)
-        {
-            return ln.Contains("dir ");
-        }
+        private static bool IsDirectory(string ln) => ln.Contains("dir ");
 
-        private static bool IsChangeDirectory(string ln)
-        {
-            return Regex.IsMatch(ln, @"\$ cd [a-z]+");
-        }
+        private static bool IsChangeDirectory(string ln) => Regex.IsMatch(ln, @"\$ cd [a-z]+");
 
-        private static bool IsFile(string ln)
-        {
-            return Regex.IsMatch(ln, "[0-9]+ [A-z]+");
-        }
+        private static bool IsFile(string ln) => Regex.IsMatch(ln, "[0-9]+ [A-z]+");
 
         private class Directory
         {
@@ -103,8 +89,8 @@ namespace AdventOfCode.D7
             public List<Directory> Directories { get; private set; } = new List<Directory>();
             public IReadOnlyList<File> Files => _files.ToImmutableList();
             public int Size => Files.Sum(f => f.Length) + Directories.Sum(d => d.Size);
-            
-            private readonly List<File> _files  = new();
+
+            private readonly List<File> _files = new();
 
             public Directory(string name)
             {
@@ -139,42 +125,8 @@ namespace AdventOfCode.D7
             public File(string name, int length)
             {
                 Name = name ?? throw new ArgumentNullException(nameof(name));
-                Length = length; 
+                Length = length;
             }
-        }
-
-        private static int GetSize(Directory root)
-        {
-            int size = 0;
-            foreach (Directory dir in root.Directories)
-            {
-                size += GetSize(dir);
-            }
-
-            return root.Size <= 100000 ? size += root.Size : size;
-        }
-
-        private static void Part2()
-        {
-            var input = System.IO.File.ReadAllText(@"data\input.txt");
-
-            Directory root = ParseInput(input);
-            int spaceInUse = root.Size;
-
-            const int totalSpace = 70000000;
-            int unsedSpace = totalSpace - spaceInUse;
-
-            const int requiredSpaceForUpdate = 30000000;
-            int additionalSpaceRequiredForUpdate = Math.Abs(unsedSpace - requiredSpaceForUpdate);
-
-            List<int> sizes = GetSizes(root);
-            
-            Console.WriteLine("Find the smallest directory that, if deleted, "
-                + "would free up enough space on the file system to run the update. "
-                + "What is the total size of that directory?");
-
-            int result = sizes.Where(x => x >= additionalSpaceRequiredForUpdate).Min();
-            Console.WriteLine(result);
         }
 
         private static List<int> GetSizes(Directory root)
@@ -187,6 +139,28 @@ namespace AdventOfCode.D7
 
             sizes.Add(root.Size);
             return sizes;
+        }
+
+        private static void Part2()
+        {
+            Console.WriteLine("Find the smallest directory that, if deleted, "
+                + "would free up enough space on the file system to run the update. "
+                + "What is the total size of that directory?");
+
+            var input = System.IO.File.ReadAllText(@"data\input.txt");
+
+            Directory root = ParseInput(input);
+            int spaceInUse = root.Size;
+
+            const int totalSpace = 70000000;
+            int unsedSpace = totalSpace - spaceInUse;
+
+            const int requiredSpaceForUpdate = 30000000;
+            int additionalSpaceRequiredForUpdate = Math.Abs(unsedSpace - requiredSpaceForUpdate);
+
+            List<int> sizes = GetSizes(root);
+            int result = sizes.Where(x => x >= additionalSpaceRequiredForUpdate).Min();
+            Console.WriteLine(result);
         }
     }
 }
