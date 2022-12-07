@@ -1,5 +1,8 @@
 ﻿using System.Text.RegularExpressions;
 using System.IO;
+using System.Collections.Immutable;
+using System.Security.Cryptography.X509Certificates;
+using System.ComponentModel.Design.Serialization;
 
 namespace AdventOfCode.D7
 {
@@ -8,6 +11,7 @@ namespace AdventOfCode.D7
         public static void Main(string[] args)
         {
             Part1();
+            Part2();
 
             Console.WriteLine("Press any key to close.");
             Console.ReadKey();
@@ -18,30 +22,6 @@ namespace AdventOfCode.D7
             Console.WriteLine("Find all of the directories with a total size of at most 100000. "
                 + "What is the sum of the total sizes of those directories?");
 
-//            var input =
-//@"$ cd /
-//$ ls
-//dir a
-//14848514 b.txt
-//8504156 c.dat
-//dir d
-//$ cd a
-//$ ls
-//dir e
-//29116 f
-//2557 g
-//62596 h.lst
-//$ cd e
-//$ ls
-//584 i
-//$ cd ..
-//$ cd ..
-//$ cd d
-//$ ls
-//4060174 j
-//8033020 d.log
-//5626152 d.ext
-//7214296 k";
             var input = System.IO.File.ReadAllText(@"data\input.txt");
 
             Directory root = ParseInput(input);
@@ -121,9 +101,10 @@ namespace AdventOfCode.D7
             public string Name { get; private set; }
             public Directory? Parent { get; private set; } = null;
             public List<Directory> Directories { get; private set; } = new List<Directory>();
-            public List<File> Files { get; private set; } = new List<File>();
-
+            public IReadOnlyList<File> Files => _files.ToImmutableList();
             public int Size => Files.Sum(f => f.Length) + Directories.Sum(d => d.Size);
+            
+            private readonly List<File> _files  = new();
 
             public Directory(string name)
             {
@@ -144,7 +125,7 @@ namespace AdventOfCode.D7
             public File CreateFile(string name, int length)
             {
                 var file = new File(name, length);
-                Files.Add(file);
+                _files.Add(file);
 
                 return file;
             }
@@ -152,13 +133,13 @@ namespace AdventOfCode.D7
 
         private class File
         {
-            public string Name { get; private set; }
-            public int Length { get; private set; }
+            public string Name { get; init; }
+            public int Length { get; init; }
 
             public File(string name, int length)
             {
                 Name = name ?? throw new ArgumentNullException(nameof(name));
-                Length = length;
+                Length = length; 
             }
         }
 
@@ -171,6 +152,41 @@ namespace AdventOfCode.D7
             }
 
             return root.Size <= 100000 ? size += root.Size : size;
+        }
+
+        private static void Part2()
+        {
+            var input = System.IO.File.ReadAllText(@"data\input.txt");
+
+            Directory root = ParseInput(input);
+            int spaceInUse = root.Size;
+
+            const int totalSpace = 70000000;
+            int unsedSpace = totalSpace - spaceInUse;
+
+            const int requiredSpaceForUpdate = 30000000;
+            int additionalSpaceRequiredForUpdate = Math.Abs(unsedSpace - requiredSpaceForUpdate);
+
+            List<int> sizes = GetSizes(root);
+            
+            Console.WriteLine("Find the smallest directory that, if deleted, "
+                + "would free up enough space on the file system to run the update. "
+                + "What is the total size of that directory?");
+
+            int result = sizes.Where(x => x >= additionalSpaceRequiredForUpdate).Min();
+            Console.WriteLine(result);
+        }
+
+        private static List<int> GetSizes(Directory root)
+        {
+            var sizes = new List<int>();
+            foreach (Directory dir in root.Directories)
+            {
+                sizes.AddRange(GetSizes(dir));
+            }
+
+            sizes.Add(root.Size);
+            return sizes;
         }
     }
 }
