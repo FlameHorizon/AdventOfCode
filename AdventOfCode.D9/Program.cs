@@ -144,6 +144,8 @@ namespace AdventOfCode.D9
                     {
                         var leadingKnot = PiecesPoints[j - 1];
                         var followingKnot = PiecesPoints[j];
+
+                        // Manhattan distance.
                         var distance = (leadingKnot.X - followingKnot.X, leadingKnot.Y - followingKnot.Y);
 
                         Vector moveVector = distance switch
