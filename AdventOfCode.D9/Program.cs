@@ -171,7 +171,6 @@ namespace AdventOfCode.D9
 
         public class BigBoard
         {
-            public Program.Point HeadPosition { get; set; } = new Point();
             public Program.Point[] PiecesPoints { get; init; } = new Point[10];
 
             public BigBoard()
@@ -180,19 +179,11 @@ namespace AdventOfCode.D9
                 {
                     PiecesPoints[i] = new Program.Point();
                 }
-                HeadPosition = PiecesPoints[0];
-
-                _visited.Add("0 0", 1);
+                _visited.Add(PiecesPoints[0].X + " " + PiecesPoints[0].Y, 1);
             }
 
             private Dictionary<string, int> _visited = new();
-            public int TailPositionsVisitedCount
-            {
-                get
-                {
-                    return _visited.Keys.Count;
-                }
-            }
+            public int TailPositionsVisitedCount => _visited.Keys.Count;
 
             public void MoveHead(IEnumerable<Move> moves)
             {
@@ -221,45 +212,18 @@ namespace AdventOfCode.D9
                         var distance = (leadingKnot.X - followingKnot.X, leadingKnot.Y - followingKnot.Y);
 
                         Program.Vector moveVector = null!;
-                        #region Find vector
-                        if (distance == (2, 2))
+                        moveVector = distance switch
                         {
-                            moveVector = new Program.Vector(1, 1);
-                        }
-                        else if (distance == (-2, -2))
-                        {
-                            moveVector = new Program.Vector(-1, -1);
-                        }
-                        else if (distance == (-2, 2))
-                        {
-                            moveVector = new Program.Vector(-1, 1);
-                        }
-                        else if (distance == (2, -2))
-                        {
-                            moveVector = new Program.Vector(1, -1);
-                        }
-                        else if (distance is (int x3, -2))
-                        {
-                            moveVector = new Program.Vector(x3, -1);
-                        }
-                        else if (distance is (-2, int x4))
-                        {
-                            moveVector = new Program.Vector(-1, x4);
-                        }
-                        else if (distance is (2, int x2))
-                        {
-                            moveVector = new Program.Vector(1, x2);
-                        }
-                        else if (distance is (int x1, 2))
-                        {
-                            moveVector = new Program.Vector(x1, 1);
-                        }
-                        else
-                        {
-                            moveVector = new Program.Vector(0, 0);
-                        }
-                        #endregion
-
+                            (2, 2) => new Program.Vector(1, 1),
+                            (-2, -2) => new Program.Vector(-1, -1),
+                            (-2, 2) => new Program.Vector(-1, 1),
+                            (2, -2) => new Program.Vector(1, -1),
+                            (int x, -2) => new Program.Vector(x, -1),
+                            (-2, int x) => new Program.Vector(-1, x),
+                            (2, int x) => new Program.Vector(1, x),
+                            (int x, 2) => new Program.Vector(x, 1),
+                            _ => new Program.Vector(0, 0)
+                        };
                         PiecesPoints[j] = PiecesPoints[j].Add(moveVector);
                     }
                     _visited.TryAdd(PiecesPoints[9].X + " " + PiecesPoints[9].Y, 1);
@@ -337,7 +301,7 @@ namespace AdventOfCode.D9
 
             public Vector Inverse()
             {
-                return new Vector(X * (- 1), Y * (- 1));
+                return new Vector(X * (-1), Y * (-1));
             }
         }
     }
