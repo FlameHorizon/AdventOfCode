@@ -18,7 +18,7 @@ namespace AdventOfCode.D9
             string[] input = File.ReadAllLines("input.txt");
 
             IEnumerable<Move> moves = ParseMoves(input);
-            var board = new Board();
+            var board = new Board(2);
             board.MoveHead(moves);
 
             var result = board.TailPositionsVisitedCount;
@@ -86,74 +86,6 @@ namespace AdventOfCode.D9
             Down
         }
 
-        public class Board
-        {
-            public char[,] State { get; init; }
-            public Program.Point HeadPosition { get; private set; }
-            public Program.Point TailPosition { get; private set; }
-            public int TailPositionsVisitedCount
-            {
-                get
-                {
-                    return _visited.Keys.Count;
-                }
-            }
-
-            private Dictionary<string, int> _visited = new();
-
-            public Board()
-            {
-                State = new char[,]
-                {
-                    { '.','.','.','.','.','.' },
-                    { '.','.','.','.','.','.' },
-                    { '.','.','.','.','.','.' },
-                    { '.','.','.','.','.','.' },
-                    { 'H','.','.','.','.','.' }
-                };
-
-                HeadPosition = new Program.Point(0, 0);
-                TailPosition = new Program.Point(0, 0);
-                _visited.Add(TailPosition.X + " " + TailPosition.Y, 1);
-            }
-
-            public void MoveHead(IEnumerable<Move> moves)
-            {
-                moves.ToList().ForEach(m => MoveHead(m));
-            }
-
-            public void MoveHead(Move move)
-            {
-                for (int i = 1; i <= move.Distance; i++)
-                {
-                    Vector headMoveVector = move.Direction switch
-                    {
-                        MoveDirection.Right => new Vector(1, 0),
-                        MoveDirection.Up => new Vector(0, 1),
-                        MoveDirection.Left => new Vector(-1, 0),
-                        MoveDirection.Down => new Vector(0, -1),
-                        _ => throw new InvalidEnumArgumentException()
-                    };
-
-                    HeadPosition = HeadPosition.Add(headMoveVector);
-
-                    if (GetDistance(HeadPosition, TailPosition) >= 2)
-                    {
-                        Program.Vector tailMoveVector = headMoveVector.Inverse();
-                        TailPosition = HeadPosition.Add(tailMoveVector);
-                        _visited.TryAdd(TailPosition.X + " " + TailPosition.Y, 1);
-                    }
-                }
-            }
-
-            private static double GetDistance(Program.Point p1,
-                Program.Point p2)
-            {
-                return Math.Sqrt(Math.Pow((p2.X - p1.X), 2)
-                               + Math.Pow((p2.Y - p1.Y), 2));
-            }
-        }
-
         private static void Part2()
         {
             Console.WriteLine("Simulate your complete series of motions on a larger rope with ten knots. "
@@ -162,24 +94,27 @@ namespace AdventOfCode.D9
             string[] input = File.ReadAllLines("input.txt");
 
             IEnumerable<Move> moves = ParseMoves(input);
-            var board = new BigBoard();
+            var board = new Board(10);
             board.MoveHead(moves);
 
             var result = board.TailPositionsVisitedCount;
             Console.WriteLine(result);
         }
 
-        public class BigBoard
+        public class Board
         {
-            public Program.Point[] PiecesPoints { get; init; } = new Point[10];
+            public Program.Point[] PiecesPoints { get; init; }
+            public Program.Point HeadPosition => PiecesPoints.First();
+            public Program.Point TailPosition => PiecesPoints.Last();
 
-            public BigBoard()
+            public Board(int size)
             {
+                PiecesPoints = new Point[size];
                 for (int i = 0; i < PiecesPoints.Length; i++)
                 {
                     PiecesPoints[i] = new Program.Point();
                 }
-                _visited.Add(PiecesPoints[0].X + " " + PiecesPoints[0].Y, 1);
+                _visited.Add(PiecesPoints.First().X + " " + PiecesPoints.First().Y, 1);
             }
 
             private Dictionary<string, int> _visited = new();
@@ -211,8 +146,7 @@ namespace AdventOfCode.D9
                         var followingKnot = PiecesPoints[j];
                         var distance = (leadingKnot.X - followingKnot.X, leadingKnot.Y - followingKnot.Y);
 
-                        Program.Vector moveVector = null!;
-                        moveVector = distance switch
+                        Vector moveVector = distance switch
                         {
                             (2, 2) => new Program.Vector(1, 1),
                             (-2, -2) => new Program.Vector(-1, -1),
@@ -226,14 +160,8 @@ namespace AdventOfCode.D9
                         };
                         PiecesPoints[j] = PiecesPoints[j].Add(moveVector);
                     }
-                    _visited.TryAdd(PiecesPoints[9].X + " " + PiecesPoints[9].Y, 1);
+                    _visited.TryAdd(PiecesPoints.Last().X + " " + PiecesPoints.Last().Y, 1);
                 }
-            }
-
-            private static double GetDistnace(Program.Point p1, Program.Point p2)
-            {
-                return Math.Sqrt(Math.Pow((p2.X - p1.X), 2)
-                               + Math.Pow((p2.Y - p1.Y), 2));
             }
         }
 
