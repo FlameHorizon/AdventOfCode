@@ -19,8 +19,8 @@ namespace AdventOfCode.D9.Tests
             };
 
             Assert.Equal(expected, board.State);
-            Assert.Equal(new Tuple<int, int>(0, 4), board.HeadPosition);
-            Assert.Equal(new Tuple<int, int>(0, 4), board.TailPosition);
+            Assert.Equal(new Program.Point(0, 0), board.HeadPosition);
+            Assert.Equal(new Program.Point(0, 0), board.TailPosition);
         }
 
         [Fact]
@@ -29,36 +29,36 @@ namespace AdventOfCode.D9.Tests
             var board = new Board();
 
             board.MoveHead(new Move(MoveDirection.Right, 4));
-            Assert.Equal(new Tuple<int, int>(4, 4), board.HeadPosition);
-            Assert.Equal(new Tuple<int, int>(3, 4), board.TailPosition);
+            Assert.Equal(new Program.Point(4, 0), board.HeadPosition);
+            Assert.Equal(new Program.Point(3, 0), board.TailPosition);
 
             board.MoveHead(new Move(MoveDirection.Up, 4));
-            Assert.Equal(new Tuple<int, int>(4, 0), board.HeadPosition);
-            Assert.Equal(new Tuple<int, int>(4, 1), board.TailPosition);
+            Assert.Equal(new Program.Point(4, 4), board.HeadPosition);
+            Assert.Equal(new Program.Point(4, 3), board.TailPosition);
 
             board.MoveHead(new Move(MoveDirection.Left, 3));
-            Assert.Equal(new Tuple<int, int>(1, 0), board.HeadPosition);
-            Assert.Equal(new Tuple<int, int>(2, 0), board.TailPosition);
+            Assert.Equal(new Program.Point(1, 4), board.HeadPosition);
+            Assert.Equal(new Program.Point(2, 4), board.TailPosition);
 
             board.MoveHead(new Move(MoveDirection.Down, 1));
-            Assert.Equal(new Tuple<int, int>(1, 1), board.HeadPosition);
-            Assert.Equal(new Tuple<int, int>(2, 0), board.TailPosition);
+            Assert.Equal(new Program.Point(1, 3), board.HeadPosition);
+            Assert.Equal(new Program.Point(2, 4), board.TailPosition);
 
             board.MoveHead(new Move(MoveDirection.Right, 4));
-            Assert.Equal(new Tuple<int, int>(5, 1), board.HeadPosition);
-            Assert.Equal(new Tuple<int, int>(4, 1), board.TailPosition);
+            Assert.Equal(new Program.Point(5, 3), board.HeadPosition);
+            Assert.Equal(new Program.Point(4, 3), board.TailPosition);
 
             board.MoveHead(new Move(MoveDirection.Down, 1));
-            Assert.Equal(new Tuple<int, int>(5, 2), board.HeadPosition);
-            Assert.Equal(new Tuple<int, int>(4, 1), board.TailPosition);
+            Assert.Equal(new Program.Point(5, 2), board.HeadPosition);
+            Assert.Equal(new Program.Point(4, 3), board.TailPosition);
 
             board.MoveHead(new Move(MoveDirection.Left, 5));
-            Assert.Equal(new Tuple<int, int>(0, 2), board.HeadPosition);
-            Assert.Equal(new Tuple<int, int>(1, 2), board.TailPosition);
+            Assert.Equal(new Program.Point(0, 2), board.HeadPosition);
+            Assert.Equal(new Program.Point(1, 2), board.TailPosition);
 
             board.MoveHead(new Move(MoveDirection.Right, 2));
-            Assert.Equal(new Tuple<int, int>(2, 2), board.HeadPosition);
-            Assert.Equal(new Tuple<int, int>(1, 2), board.TailPosition);
+            Assert.Equal(new Program.Point(2, 2), board.HeadPosition);
+            Assert.Equal(new Program.Point(1, 2), board.TailPosition);
         }
 
         [Fact]
@@ -67,43 +67,27 @@ namespace AdventOfCode.D9.Tests
             var board = new Board();
 
             board.MoveHead(new Move(MoveDirection.Right, 4));
-            Assert.Equal(new Tuple<int, int>(4, 4), board.HeadPosition);
-            Assert.Equal(new Tuple<int, int>(3, 4), board.TailPosition);
             Assert.Equal(4, board.TailPositionsVisitedCount);
 
             board.MoveHead(new Move(MoveDirection.Up, 4));
-            Assert.Equal(new Tuple<int, int>(4, 0), board.HeadPosition);
-            Assert.Equal(new Tuple<int, int>(4, 1), board.TailPosition);
             Assert.Equal(7, board.TailPositionsVisitedCount);
 
             board.MoveHead(new Move(MoveDirection.Left, 3));
-            Assert.Equal(new Tuple<int, int>(1, 0), board.HeadPosition);
-            Assert.Equal(new Tuple<int, int>(2, 0), board.TailPosition);
             Assert.Equal(9, board.TailPositionsVisitedCount);
 
             board.MoveHead(new Move(MoveDirection.Down, 1));
-            Assert.Equal(new Tuple<int, int>(1, 1), board.HeadPosition);
-            Assert.Equal(new Tuple<int, int>(2, 0), board.TailPosition);
             Assert.Equal(9, board.TailPositionsVisitedCount);
 
             board.MoveHead(new Move(MoveDirection.Right, 4));
-            Assert.Equal(new Tuple<int, int>(5, 1), board.HeadPosition);
-            Assert.Equal(new Tuple<int, int>(4, 1), board.TailPosition);
             Assert.Equal(10, board.TailPositionsVisitedCount);
 
             board.MoveHead(new Move(MoveDirection.Down, 1));
-            Assert.Equal(new Tuple<int, int>(5, 2), board.HeadPosition);
-            Assert.Equal(new Tuple<int, int>(4, 1), board.TailPosition);
             Assert.Equal(10, board.TailPositionsVisitedCount);
 
             board.MoveHead(new Move(MoveDirection.Left, 5));
-            Assert.Equal(new Tuple<int, int>(0, 2), board.HeadPosition);
-            Assert.Equal(new Tuple<int, int>(1, 2), board.TailPosition);
             Assert.Equal(13, board.TailPositionsVisitedCount);
 
             board.MoveHead(new Move(MoveDirection.Right, 2));
-            Assert.Equal(new Tuple<int, int>(2, 2), board.HeadPosition);
-            Assert.Equal(new Tuple<int, int>(1, 2), board.TailPosition);
             Assert.Equal(13, board.TailPositionsVisitedCount);
 
         }

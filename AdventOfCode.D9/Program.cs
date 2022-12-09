@@ -1,8 +1,4 @@
-﻿using System;
-using System.Diagnostics.SymbolStore;
-using System.Drawing;
-using System.Numerics;
-using static AdventOfCode.D9.Program;
+﻿using System.ComponentModel;
 
 namespace AdventOfCode.D9
 {
@@ -40,7 +36,7 @@ namespace AdventOfCode.D9
         {
             public MoveDirection Direction { get; init; }
             public int Distance { get; init; }
-            public Tuple<int, int> Vector { get; init; }
+            public Program.Vector Vector { get; init; }
 
             public Move(string raw)
             {
@@ -50,14 +46,14 @@ namespace AdventOfCode.D9
                 Vector = GetVector();
             }
 
-            private Tuple<int, int> GetVector()
+            private Program.Vector GetVector()
             {
                 return Direction switch
                 {
-                    MoveDirection.Right => new Tuple<int, int>(Distance, 0),
-                    MoveDirection.Up => new Tuple<int, int>(0, -Distance),
-                    MoveDirection.Left => new Tuple<int, int>(-Distance, 0),
-                    MoveDirection.Down => new Tuple<int, int>(0, Distance),
+                    MoveDirection.Right => new Program.Vector(Distance, 0),
+                    MoveDirection.Up => new Program.Vector(0, Distance),
+                    MoveDirection.Left => new Program.Vector(-Distance, 0),
+                    MoveDirection.Down => new Program.Vector(0, -Distance),
                     _ => throw new ArgumentException("Cannot create vector.")
                 };
             }
@@ -93,8 +89,8 @@ namespace AdventOfCode.D9
         public class Board
         {
             public char[,] State { get; init; }
-            public Tuple<int, int> HeadPosition { get; private set; }
-            public Tuple<int, int> TailPosition { get; private set; }
+            public Program.Point HeadPosition { get; private set; }
+            public Program.Point TailPosition { get; private set; }
             public int TailPositionsVisitedCount
             {
                 get
@@ -116,9 +112,9 @@ namespace AdventOfCode.D9
                     { 'H','.','.','.','.','.' }
                 };
 
-                HeadPosition = new Tuple<int, int>(0, 4);
-                TailPosition = new Tuple<int, int>(0, 4);
-                _visited.Add(TailPosition.Item1 + " " + TailPosition.Item2, 1);
+                HeadPosition = new Program.Point(0, 0);
+                TailPosition = new Program.Point(0, 0);
+                _visited.Add(TailPosition.X + " " + TailPosition.Y, 1);
             }
 
             public void MoveHead(IEnumerable<Move> moves)
@@ -130,65 +126,31 @@ namespace AdventOfCode.D9
             {
                 for (int i = 1; i <= move.Distance; i++)
                 {
-                    if (move.Direction == MoveDirection.Right)
+                    Vector headMoveVector = move.Direction switch
                     {
-                        var vector = new Tuple<int, int>(1, 0);
-                        HeadPosition = AddByVector(HeadPosition, vector);
+                        MoveDirection.Right => new Vector(1, 0),
+                        MoveDirection.Up => new Vector(0, 1),
+                        MoveDirection.Left => new Vector(-1, 0),
+                        MoveDirection.Down => new Vector(0, -1),
+                        _ => throw new InvalidEnumArgumentException()
+                    };
 
-                        if (GetDistnace(HeadPosition, TailPosition) >= 2)
-                        {
-                            TailPosition = AddByVector(HeadPosition, new Tuple<int, int>(-1, 0));
-                            _visited.TryAdd(TailPosition.Item1 + " " + TailPosition.Item2, 1);
-                        }
-                    }
-                    else if (move.Direction == MoveDirection.Up)
+                    HeadPosition = HeadPosition.Add(headMoveVector);
+
+                    if (GetDistance(HeadPosition, TailPosition) >= 2)
                     {
-                        var vector = new Tuple<int, int>(0, -1);
-                        HeadPosition = AddByVector(HeadPosition, vector);
-
-                        if (GetDistnace(HeadPosition, TailPosition) >= 2)
-                        {
-                            TailPosition = AddByVector(HeadPosition, new Tuple<int, int>(0, 1));
-                            _visited.TryAdd(TailPosition.Item1 + " " + TailPosition.Item2, 1);
-                        }
-                    }
-                    else if (move.Direction == MoveDirection.Left)
-                    {
-                        var vector = new Tuple<int, int>(-1, 0);
-                        HeadPosition = AddByVector(HeadPosition, vector);
-
-                        if (GetDistnace(HeadPosition, TailPosition) >= 2)
-                        {
-                            TailPosition = AddByVector(HeadPosition, new Tuple<int, int>(1, 0));
-                            _visited.TryAdd(TailPosition.Item1 + " " + TailPosition.Item2, 1);
-                        }
-                    }
-                    else if (move.Direction == MoveDirection.Down)
-                    {
-                        var vector = new Tuple<int, int>(0, 1);
-                        HeadPosition = AddByVector(HeadPosition, vector);
-
-                        if (GetDistnace(HeadPosition, TailPosition) >= 2)
-                        {
-                            TailPosition = AddByVector(HeadPosition, new Tuple<int, int>(0, -1));
-                            _visited.TryAdd(TailPosition.Item1 + " " + TailPosition.Item2, 1);
-                        }
+                        Program.Vector tailMoveVector = headMoveVector.Inverse();
+                        TailPosition = HeadPosition.Add(tailMoveVector);
+                        _visited.TryAdd(TailPosition.X + " " + TailPosition.Y, 1);
                     }
                 }
             }
 
-            private static Tuple<int, int> AddByVector(Tuple<int, int> point,
-                Tuple<int, int> vector)
+            private static double GetDistance(Program.Point p1,
+                Program.Point p2)
             {
-                return new Tuple<int, int>(point.Item1 + vector.Item1,
-                                           point.Item2 + vector.Item2);
-            }
-
-            private static double GetDistnace(Tuple<int, int> p1,
-                Tuple<int, int> p2)
-            {
-                return Math.Sqrt(Math.Pow((p2.Item1 - p1.Item1), 2)
-                               + Math.Pow((p2.Item2 - p1.Item2), 2));
+                return Math.Sqrt(Math.Pow((p2.X - p1.X), 2)
+                               + Math.Pow((p2.Y - p1.Y), 2));
             }
         }
 
@@ -257,7 +219,7 @@ namespace AdventOfCode.D9
                         var leadingKnot = PiecesPoints[j - 1];
                         var followingKnot = PiecesPoints[j];
                         var distance = (leadingKnot.X - followingKnot.X, leadingKnot.Y - followingKnot.Y);
-                        
+
                         Program.Vector moveVector = null!;
                         #region Find vector
                         if (distance == (2, 2))
@@ -347,7 +309,7 @@ namespace AdventOfCode.D9
             }
         }
 
-        public class Vector
+        public class Vector : IEquatable<Vector>
         {
             public int X { get; private set; }
             public int Y { get; private set; }
@@ -356,6 +318,26 @@ namespace AdventOfCode.D9
             {
                 X = x;
                 Y = y;
+            }
+
+            public bool Equals(Vector? other)
+            {
+                if (other == null)
+                {
+                    return false;
+                }
+
+                return other.X == X && other.Y == Y;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return Equals(obj as Vector);
+            }
+
+            public Vector Inverse()
+            {
+                return new Vector(X * (- 1), Y * (- 1));
             }
         }
     }

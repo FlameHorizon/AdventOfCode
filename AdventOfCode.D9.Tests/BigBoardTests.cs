@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using static AdventOfCode.D9.Program;
+﻿using static AdventOfCode.D9.Program;
 
 namespace AdventOfCode.D9.Tests
 {
