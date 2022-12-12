@@ -1,5 +1,7 @@
 ﻿namespace AdventOfCode.D11.Others
 {
+    // Author: OCD_Tiger
+    // Source: https://www.reddit.com/r/adventofcode/comments/zifqmh/comment/izrxpb8/?utm_source=share&utm_medium=web2x&context=3
     using System.Numerics;
 
     class Monkey
