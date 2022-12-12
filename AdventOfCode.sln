@@ -27,7 +27,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdventOfCode.D9.Tests", "Ad
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdventOfCode.D10", "AdventOfCode.D10\AdventOfCode.D10.csproj", "{70234AF6-95E9-491E-9201-CE6622F9B6E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdventOfCode.D10.Tests", "AdventOfCode.D10.Tests\AdventOfCode.D10.Tests.csproj", "{E8859131-C709-45A8-B9DC-AB20886D1E10}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdventOfCode.D10.Tests", "AdventOfCode.D10.Tests\AdventOfCode.D10.Tests.csproj", "{E8859131-C709-45A8-B9DC-AB20886D1E10}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdventOfCode.D11", "AdventOfCode.D11\AdventOfCode.D11.csproj", "{F0943B58-B0C2-4360-84AA-2D7D5C69D4B6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdventOfCode.D11.Tests", "AdventOfCode.D11.Tests\AdventOfCode.D11.Tests.csproj", "{9394D172-986D-4416-BDDF-09802CF50CDD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdventOfCode.D11.Others", "AdventOfCode.D11.Others\AdventOfCode.D11.Others.csproj", "{B1DB20E8-C60A-4470-9870-B7F580045205}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,6 +93,18 @@ Global
 		{E8859131-C709-45A8-B9DC-AB20886D1E10}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E8859131-C709-45A8-B9DC-AB20886D1E10}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E8859131-C709-45A8-B9DC-AB20886D1E10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0943B58-B0C2-4360-84AA-2D7D5C69D4B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0943B58-B0C2-4360-84AA-2D7D5C69D4B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0943B58-B0C2-4360-84AA-2D7D5C69D4B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0943B58-B0C2-4360-84AA-2D7D5C69D4B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9394D172-986D-4416-BDDF-09802CF50CDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9394D172-986D-4416-BDDF-09802CF50CDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9394D172-986D-4416-BDDF-09802CF50CDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9394D172-986D-4416-BDDF-09802CF50CDD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1DB20E8-C60A-4470-9870-B7F580045205}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1DB20E8-C60A-4470-9870-B7F580045205}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1DB20E8-C60A-4470-9870-B7F580045205}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1DB20E8-C60A-4470-9870-B7F580045205}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
