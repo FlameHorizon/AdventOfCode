@@ -1,173 +1,163 @@
-﻿namespace AdventOfCode.D2
+﻿// ReSharper disable SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
+namespace AdventOfCode.D2;
+
+public abstract class Program
 {
-    public class Program
+    public static void Main()
     {
-        public static void Main(string[] args)
+        Part1();
+        Part2();
+    }
+
+    private static void Part1()
+    {
+        Console.WriteLine(
+            "What would your total score be if everything "
+            + "goes exactly according to your strategy guide?");
+
+        int totalScore = GetTotalScore();
+        Console.WriteLine(totalScore);
+    }
+
+    private static int GetTotalScore()
+    {
+        var total = 0;
+
+        foreach (string line in File.ReadAllLines(@"data/input.txt"))
         {
-            Part1();
-            Part2();
+            Shape opponentShape = GetOpponentShape(line);
+            Shape playerShape = GetPlayerShape(line);
 
-            Console.WriteLine("Press any key to close.");
-            Console.ReadKey();
-        }
+            // Result is calculated from the perspective of player, not the opponent.
+            GameResult result = GetResult(opponentShape, playerShape); 
+            int playerShapeScore = GetScoreForShape(playerShape);
 
-        private static void Part1()
-        {
-            Console.WriteLine(
-                "What would your total score be if everything "
-                + "goes exactly according to your strategy guide?");
-
-            var totalScore = GetTotalScore();
-            Console.WriteLine(totalScore);
-        }
-
-        private static object GetTotalScore()
-        {
-            int total = 0;
-
-            foreach (var line in File.ReadAllLines(@"data\input.txt"))
+            total += result switch
             {
-                Shape opponentShape = GetOpponentShape(line);
-                Shape playerShape = GetPlayerShape(line);
-
-                // Result is calculated from the perspective of player, not the opponent.
-                GameResult result = GetResult(opponentShape, playerShape); 
-                int playerShapeScore = GetScoreForShape(playerShape);
-
-                total += result switch
-                {
-                    GameResult.Win => playerShapeScore + 6,
-                    GameResult.Draw => playerShapeScore + 3,
-                    _ => playerShapeScore,
-                };
-            }
-
-            return total;
-        }
-
-        private static Shape GetOpponentShape(string line)
-        {
-            return line.Split(" ").First() switch 
-            {
-                "A" => Shape.Rock,
-                "B" => Shape.Paper,
-                "C" => Shape.Scissors,
-                _ => throw new ArgumentOutOfRangeException(nameof(line))
+                GameResult.Win => playerShapeScore + 6,
+                GameResult.Draw => playerShapeScore + 3,
+                _ => playerShapeScore,
             };
         }
 
-        private static Shape GetPlayerShape(string line)
+        return total;
+    }
+
+    private static Shape GetOpponentShape(string line)
+    {
+        return line.Split(" ").First() switch 
         {
-            return line.Split(" ")[1] switch
-            {
-                "X" => Shape.Rock,
-                "Y" => Shape.Paper,
-                "Z" => Shape.Scissors,
-                _ => throw new ArgumentOutOfRangeException(nameof(line))
-            };
-        }
+            "A" => Shape.Rock,
+            "B" => Shape.Paper,
+            "C" => Shape.Scissors,
+            _ => throw new ArgumentOutOfRangeException(nameof(line))
+        };
+    }
+
+    private static Shape GetPlayerShape(string line)
+    {
+        return line.Split(" ")[1] switch
+        {
+            "X" => Shape.Rock,
+            "Y" => Shape.Paper,
+            "Z" => Shape.Scissors,
+            _ => throw new ArgumentOutOfRangeException(nameof(line))
+        };
+    }
         
-        private static GameResult GetResult(Shape opponentShape, Shape playerShape)
+    private static GameResult GetResult(Shape opponentShape, Shape playerShape)
+    {
+        if (opponentShape == playerShape)
         {
-            if (opponentShape == playerShape)
-            {
-                return GameResult.Draw;
-            }
-            else if (opponentShape == Shape.Rock && playerShape == Shape.Paper)
-            {
+            return GameResult.Draw;
+        }
+
+        switch (opponentShape)
+        {
+            case Shape.Rock when playerShape == Shape.Paper:
+            case Shape.Paper when playerShape == Shape.Scissors:
+            case Shape.Scissors when playerShape == Shape.Rock:
                 return GameResult.Win;
-            }
-            else if (opponentShape == Shape.Paper && playerShape == Shape.Scissors)
-            {
-                return GameResult.Win;
-            } 
-            else if (opponentShape == Shape.Scissors && playerShape == Shape.Rock)
-            {
-                return GameResult.Win;
-            } 
-            else
-            {
+            default:
                 return GameResult.Lose;
-            }
         }
+    }
 
-        private static int GetScoreForShape(Shape playerShape)
+    private static int GetScoreForShape(Shape playerShape)
+    {
+        return playerShape switch
         {
-            return playerShape switch
+            Shape.Rock => 1,
+            Shape.Paper => 2,
+            Shape.Scissors => 3,
+            _ => throw new ArgumentOutOfRangeException($"This shape {playerShape} is not defined")
+        };
+    }
+
+    private static void Part2()
+    {
+        Console.WriteLine(
+            "What would your total score be if everything "
+            + "goes exactly according to your strategy guide?");
+
+        int totalScore = GetTotalScorePart2();
+        Console.WriteLine(totalScore);
+    }
+
+    private static int GetTotalScorePart2()
+    {
+        var total = 0;
+
+        foreach (string line in File.ReadAllLines(@"data/input.txt"))
+        {
+            Shape opponentShape = GetOpponentShape(line);
+            GameResult result = GetExpectedResult(line);
+            Shape playerShape = EvalPlayerShape(opponentShape, result);
+
+            int playerShapeScore = GetScoreForShape(playerShape);
+
+            total += result switch
             {
-                Shape.Rock => 1,
-                Shape.Paper => 2,
-                Shape.Scissors => 3,
-                _ => throw new ArgumentOutOfRangeException($"This shape {playerShape} is not defined")
+                GameResult.Win => playerShapeScore + 6,
+                GameResult.Draw => playerShapeScore + 3,
+                _ => playerShapeScore,
             };
         }
 
-        private static void Part2()
-        {
-            Console.WriteLine(
-                "What would your total score be if everything "
-                + "goes exactly according to your strategy guide?");
+        return total;
+    }
 
-            var totalScore = GetTotalScorePart2();
-            Console.WriteLine(totalScore);
+    private static GameResult GetExpectedResult(string line)
+    {
+        return line.Split(" ")[1] switch
+        {
+            "X" => GameResult.Lose,
+            "Y" => GameResult.Draw,
+            "Z" => GameResult.Win,
+            _ => throw new ArgumentOutOfRangeException($"Value {line.Split(" ")[1]} outside of available range")
+        };
+    }
+
+    private static Shape EvalPlayerShape(Shape opponentShape, GameResult result)
+    {
+        if (result == GameResult.Draw)
+        {
+            return opponentShape;
         }
 
-        private static object GetTotalScorePart2()
+        int moveBy = result switch
         {
-            int total = 0;
+            GameResult.Win => 1,
+            GameResult.Lose => -1,
+            _ => throw new ArgumentOutOfRangeException(nameof(result))
+        };
 
-            foreach (var line in File.ReadAllLines(@"data\input.txt"))
-            {
-                Shape opponentShape = GetOpponentShape(line);
-                GameResult result = GetExpectedResult(line);
-                Shape playerShape = EvalPlayerShape(opponentShape, result);
+        int index = Mod((int)opponentShape + moveBy, 3);
+        return (Shape)index;
+    }
 
-                int playerShapeScore = GetScoreForShape(playerShape);
-
-                total += result switch
-                {
-                    GameResult.Win => playerShapeScore + 6,
-                    GameResult.Draw => playerShapeScore + 3,
-                    _ => playerShapeScore,
-                };
-            }
-
-            return total;
-        }
-
-        private static GameResult GetExpectedResult(string line)
-        {
-            return line.Split(" ")[1] switch
-            {
-                "X" => GameResult.Lose,
-                "Y" => GameResult.Draw,
-                "Z" => GameResult.Win,
-                _ => throw new ArgumentOutOfRangeException($"Value {line.Split(" ")[1]} outside of available range")
-            };
-        }
-
-        private static Shape EvalPlayerShape(Shape opponentShape, GameResult result)
-        {
-            if (result == GameResult.Draw)
-            {
-                return opponentShape;
-            }
-
-            int moveBy = result switch
-            {
-                GameResult.Win => 1,
-                GameResult.Lose => -1,
-                GameResult.Draw => 0,
-                _ => throw new ArgumentOutOfRangeException(nameof(result))
-            };
-
-            int index = Mod((int)opponentShape + moveBy, 3);
-            return (Shape)index;
-        }
-
-        private static int Mod(int x, int m)
-        {
-            return (x % m + m) % m;
-        }
+    private static int Mod(int x, int m)
+    {
+        return (x % m + m) % m;
     }
 }
