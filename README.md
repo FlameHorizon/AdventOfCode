@@ -1,3 +1,3 @@
 # AdventOfCode
 
-Documenting my journey through Advent of Code 2022.
+Documenting my journey through Advent of Code 2023.
